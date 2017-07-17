@@ -1,10 +1,10 @@
-#!/bin/sh
+#!/bin/bash
 #
 # For the CHIP Computer AXP09 Power mangement IC
 #
 # Jeff Brown http://photonicsguy.ca/projects/chip
 # https://github.com/Photonicsguy/CHIP
-# Version 1.0 (April 5th, 2016)
+# https://github.com/mzhboy/sunxi-axp209
 #
 # It looks like you can destroy your chip computer by writing the wrong data to certain registers on this chip!
 # (Some of the voltage outputs are programmable via registers)
@@ -50,6 +50,8 @@ exits 1 on Battery power (If battery is discharging)
 EOF
 fi
 
+[ -x /usr/sbin/i2cset ] || sudo apt install i2c-tools;
+[ -x /usr/bin/bc ] || sudo apt install bc;
 # Enable ADC registers
 i2cset -y -f 0 0x34 0x82 0xff
 
@@ -189,48 +191,49 @@ REG=`printf "%d" "$REG"`
 IPSOUT=`echo "$REG*0.0014"|bc`
 
 
+# Temperature
+REG=`i2cget -y -f 0 0x34 0x5E w|awk '{print "0x"substr($0,5,2)substr($0,4,1)}'`
+REG=`printf "%d" "$REG"`
+TEMPL=`echo "($REG*0.1)-144.7"|bc`
+echo "Temperature:	${TEMPL}°C"
+
 if [ $ALL ]; then
-	# Temperature
-	REG=`i2cget -y -f 0 0x34 0x5E w|awk '{print "0x"substr($0,5,2)substr($0,4,1)}'`
-	REG=`printf "%d" "$REG"`
-	THERM=`echo "($REG*0.1)-144.7"|bc`
-	echo "Temperature:	"$THERM"°C (I've seen as high as 65°C)"
+    echo "Battery: ${BAT_PERCENT}%"
+    if [ $BP ];then						# If -b switch is used, exit after showing battery percentage
+    	if [ $STATUS_CHG_DIR == 0 ]; then
+    		exit 1	# CHIP operating on Battery
+    	else
+		    exit 0	# CHIP on ACIN/VBUS power
+	    fi
+    fi
 fi
-echo "Battery: $BAT_PERCENT""%"
-if [ $BP ];then						# If -b switch is used, exit after showing battery percentage
+
+echo -n "ACIN:	${ACIN}V"
+if [ $ACIN_C != 0 ];then 
+	echo "   ${ACIN_C}mA"
+else
+	echo ""
+fi
+
+echo -n "VBUS:	${VBUS}V"
+if [ $VBUS_C -gt 0 ];then
+	echo "   ${VBUS_C}mA"
+else
+	echo ""
+fi
+
+if [ $VBAT -gt 0 ];then
+	echo -n "VBAT:	${VBAT}V  "
+	if [ $STATUS_CHG_DIR == 1 ]; then
+		echo "Charging at ${BAT_C}mA"
+	else
+		echo "Discharging at ${BAT_D}mA"
+	fi
+	echo "Vout:	${IPSOUT}V"
+
 	if [ $STATUS_CHG_DIR == 0 ]; then
 		exit 1	# CHIP operating on Battery
 	else
 		exit 0	# CHIP on ACIN/VBUS power
 	fi
 fi
-
-echo -n "ACIN:	$ACIN""V"
-if [ $ACIN_C != 0 ];then 
-	echo "   "$ACIN_C"mA"
-else
-	echo ""
-fi
-
-echo -n "VBUS:	$VBUS""V"
-if [ $VBUS_C != 0 ];then
-	echo "   "$VBUS_C"mA"
-else
-	echo ""
-fi
-
-echo -n "VBAT:	$VBAT V  "
-if [ $STATUS_CHG_DIR == 1 ]; then
-	echo "Charging at "$BAT_C"mA"
-else
-	echo "Discharging at "$BAT_D"mA"
-fi
-echo "Vout:	$IPSOUT V"
-
-if [ $STATUS_CHG_DIR == 0 ]; then
-	exit 1	# CHIP operating on Battery
-else
-	exit 0	# CHIP on ACIN/VBUS power
-fi
-
-
