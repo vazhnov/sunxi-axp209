@@ -9,7 +9,7 @@
 # It looks like you can destroy your chip computer by writing the wrong data to certain registers on this chip!
 # (Some of the voltage outputs are programmable via registers)
 #
-# There is only one write command in this script (to enable ADC registers)
+# There is only one write command in this script: to enable ADC registers.
 #
 #
 #
@@ -54,7 +54,6 @@ fi
 [ -x /usr/bin/bc ] || sudo apt install bc;
 
 # Check binaries are available (for example, wrong PATH or non-root user):
-
 command -v -- i2cset >/dev/null 2>&1 || { echo >&2 'No i2cset found'; exit 1; }
 command -v -- i2cget >/dev/null 2>&1 || { echo >&2 'No i2cget found'; exit 1; }
 command -v -- bc     >/dev/null 2>&1 || { echo >&2 'No bc found'; exit 1; }
@@ -69,6 +68,8 @@ STATUS_ACIN_AVAIL=$(($(($REG&0x40))/64))
 STATUS_VBUS=$(($(($REG&0x20))/32))
 STATUS_VBUS_AVAIL=$(($(($REG&0x10))/16))
 STATUS_VHOLD=$(($(($REG&0x08))/8))
+# STATUS_CHG_DIR == 1 when battery is charging
+# STATUS_CHG_DIR == 0 when battery is discharging
 STATUS_CHG_DIR=$(($(($REG&0x04))/4))
 ACVB_SHORT=$(($(($REG&0x02))/2))
 STATUS_BOOT=$(($REG&0x01))
@@ -98,7 +99,7 @@ if [ $ALL ];then
 	echo "              ACIN: $STATUS_ACIN	Avail: $STATUS_ACIN_AVAIL"
 	echo "              VBUS: $STATUS_VBUS	Avail: $STATUS_VBUS_AVAIL"
 	echo "             VHOLD: $STATUS_VHOLD (Whether VBUS is above $VHOLD""V before being used)"
-	#echo "  Charge direction: $STATUS_CHG_DIR	(0:Battery discharging; 1:The battery is charging)"
+	echo "  Charge direction: $STATUS_CHG_DIR	(0:Battery discharging; 1:The battery is charging)"
 	echo "  Shutdown voltage: ${VSHUTDOWN}V"
 	echo "VBUS current limit: $VBUS_C_LIM"
 
@@ -121,11 +122,11 @@ REG=$(i2cget -y -f 0 0x34 0x01)
 STATUS_OVRTEMP=$(($(($REG&0x80))/128))
 STATUS_CHARGING=$(($(($REG&0x40))/64))
 STATUS_BATCON=$(($(($REG&0x20))/32))
-#STATUS_=$(($(($REG&0x10))/16))
-STATUS_ACT=$(($(($REG&0x08))/8))
-STATUS_CUREXPEC=$(($(($REG&0x04))/4))
-#STATUS_=$(($(($REG&0x02))/2))
-#STATUS_=$(($REG&0x01))
+# STATUS_=$(($(($REG&0x10))/16))
+# STATUS_ACT=$(($(($REG&0x08))/8))
+# STATUS_CUREXPEC=$(($(($REG&0x04))/4))
+# STATUS_=$(($(($REG&0x02))/2))
+# STATUS_=$(($REG&0x01))
 
 if [ $STATUS_OVRTEMP == 1 ]; then
 	echo "Over Temperature"
@@ -222,13 +223,13 @@ else
 fi
 
 echo -n "VBUS:	${VBUS}V"
-if [ $VBUS_C -gt 0 ];then
+if [ "$VBUS_C" != 0 ];then
 	echo "   ${VBUS_C}mA"
 else
 	echo ""
 fi
 
-if [ $VBAT -gt 0 ];then
+if [ "$VBAT" != 0 ];then
 	echo -n "VBAT:	${VBAT}V  "
 	if [ $STATUS_CHG_DIR == 1 ]; then
 		echo "Charging at ${BAT_C}mA"
