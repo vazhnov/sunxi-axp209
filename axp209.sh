@@ -54,6 +54,7 @@ fi
 [ -x /usr/bin/bc ] || sudo apt install bc;
 
 # Check binaries are available (for example, wrong PATH or non-root user):
+
 command -v -- i2cset || { echo "No i2cset found"; exit 1; }
 command -v -- i2cget || { echo "No i2cget found"; exit 1; }
 command -v -- bc     || { echo "No bc found"; exit 1; }
@@ -98,7 +99,7 @@ if [ $ALL ];then
 	echo "              VBUS: $STATUS_VBUS	Avail: $STATUS_VBUS_AVAIL"
 	echo "             VHOLD: $STATUS_VHOLD (Whether VBUS is above $VHOLD""V before being used)"
 	#echo "  Charge direction: $STATUS_CHG_DIR	(0:Battery discharging; 1:The battery is charging)"
-	echo "  Shutdown voltage: $VSHUTDOWN"V""
+	echo "  Shutdown voltage: ${VSHUTDOWN}V"
 	echo "VBUS current limit: $VBUS_C_LIM"
 
 fi
@@ -136,71 +137,70 @@ if [ $ALL ]; then
 	echo "Battery connected: $STATUS_BATCON"
 fi
 
-if [ $STATUS_ACIN==1 ]; then
+if [ $STATUS_ACIN == 1 ]; then
 	# ACIN voltage
-	REG=`i2cget -y -f 0 0x34 0x56 w|awk '{print "0x"substr($0,5,2)substr($0,4,1)}'`
-	REG=`printf "%d" "$REG"`
-	ACIN=`echo "$REG*0.0017"|bc`
+	REG=$(i2cget -y -f 0 0x34 0x56 w|awk '{print "0x"substr($0,5,2)substr($0,4,1)}')
+	REG=$(printf "%d" "$REG")
+	ACIN=$(echo "$REG*0.0017"|bc)
 	# ACIN Current
-	REG=`i2cget -y -f 0 0x34 0x58 w|awk '{print "0x"substr($0,5,2)substr($0,4,1)}'`
-	REG=`printf "%d" "$REG"`
-	ACIN_C=`echo "$REG*0.375"|bc`
+	REG=$(i2cget -y -f 0 0x34 0x58 w|awk '{print "0x"substr($0,5,2)substr($0,4,1)}')
+	REG=$(printf "%d" "$REG")
+	ACIN_C=$(echo "$REG*0.375"|bc)
 else
 	ACIN='-'
 	ACIN_C='-'
 fi
 
-if [ $STATUS_VBUS==1 ]; then
+if [ $STATUS_VBUS == 1 ]; then
 	# VBUS voltage
-	REG=`i2cget -y -f 0 0x34 0x5A w|awk '{print "0x"substr($0,5,2)substr($0,4,1)}'`
-	REG=`printf "%d" "$REG"`
-	VBUS=`echo "$REG*0.0017"|bc`
+	REG=$(i2cget -y -f 0 0x34 0x5A w|awk '{print "0x"substr($0,5,2)substr($0,4,1)}')
+	REG=$(printf "%d" "$REG")
+	VBUS=$(echo "$REG*0.0017"|bc)
 
 	# VBUS Current
-	REG=`i2cget -y -f 0 0x34 0x5C w|awk '{print "0x"substr($0,5,2)substr($0,4,1)}'`
-	REG=`printf "%d" "$REG"`
-	VBUS_C=`echo "$REG*0.375"|bc`
+	REG=$(i2cget -y -f 0 0x34 0x5C w|awk '{print "0x"substr($0,5,2)substr($0,4,1)}')
+	REG=$(printf "%d" "$REG")
+	VBUS_C=$(echo "$REG*0.375"|bc)
 else
 	VBUS='-'
 	VBUS_C='-'
 fi
 
-if [ $STATUS_BATCON==1 ]; then
+if [ $STATUS_BATCON == 1 ]; then
 	# Battery Voltage
-	REG=`i2cget -y -f 0 0x34 0x78 w|awk '{print "0x"substr($0,5,2)substr($0,4,1)}'`
-	REG=`printf "%d" "$REG"`
-	VBAT=`echo "$REG*0.0011"|bc`
+	REG=$(i2cget -y -f 0 0x34 0x78 w|awk '{print "0x"substr($0,5,2)substr($0,4,1)}')
+	REG=$(printf "%d" "$REG")
+	VBAT=$(echo "$REG*0.0011"|bc)
 
 	if [ $STATUS_CHG_DIR == 1 ]; then
 		# Battery Charging Current
-		REG=`i2cget -y -f 0 0x34 0x7A w|awk '{print "0x"substr($0,5,2)substr($0,4,1)}'`
-		REG_C=`printf "%d" "$REG"`
-		BAT_C=`echo "scale=2;$REG_C*0.5"|bc`
+		REG=$(i2cget -y -f 0 0x34 0x7A w|awk '{print "0x"substr($0,5,2)substr($0,4,1)}')
+		REG_C=$(printf "%d" "$REG")
+		BAT_C=$(echo "scale=2;$REG_C*0.5"|bc)
 	else
 		# Battery Discharge Current
-		REG=`i2cget -y -f 0 0x34 0x7C w|awk '{print "0x"substr($0,5,2)substr($0,4,1)}'`
-		REG_D=`printf "%d" "$REG"`
-		BAT_D=`echo "scale=2;$REG_D*0.5"|bc`
+		REG=$(i2cget -y -f 0 0x34 0x7C w|awk '{print "0x"substr($0,5,2)substr($0,4,1)}')
+		REG_D=$(printf "%d" "$REG")
+		BAT_D=$(echo "scale=2;$REG_D*0.5"|bc)
 	fi
 	# Battery %
-	REG=`i2cget -y -f 0 0x34 0xB9`
-	BAT_PERCENT=`printf "%d" "$REG"`
+	REG=$(i2cget -y -f 0 0x34 0xB9)
+	BAT_PERCENT=$(printf "%d" "$REG")
 else
 	VBAT='-'
-	BATT_CUR='-'
 	BAT_PERCENT='-'
 	echo "No Battery connected"
 fi
 # System (IPSOUT) Voltage (IPS is Intelligent Power Select)
-REG=`i2cget -y -f 0 0x34 0x7E w|awk '{print "0x"substr($0,5,2)substr($0,4,1)}'`
-REG=`printf "%d" "$REG"`
-IPSOUT=`echo "$REG*0.0014"|bc`
+REG=$(i2cget -y -f 0 0x34 0x7E w|awk '{print "0x"substr($0,5,2)substr($0,4,1)}')
+REG=$(printf "%d" "$REG")
+IPSOUT=$(echo "$REG*0.0014"|bc)
 
 
 # Temperature
-REG=`i2cget -y -f 0 0x34 0x5E w|awk '{print "0x"substr($0,5,2)substr($0,4,1)}'`
-REG=`printf "%d" "$REG"`
-TEMPL=`echo "($REG*0.1)-144.7"|bc`
+REG=$(i2cget -y -f 0 0x34 0x5E w|awk '{print "0x"substr($0,5,2)substr($0,4,1)}')
+REG=$(printf "%d" "$REG")
+TEMPL=$(echo "($REG*0.1)-144.7"|bc)
 echo "Temperature:	${TEMPL}°C"
 
 if [ $ALL ]; then
