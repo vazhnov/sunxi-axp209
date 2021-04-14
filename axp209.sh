@@ -35,7 +35,7 @@ elif [ "$1" == "-v" ]; then
 	echo "https://github.com/vazhnov/sunxi-axp209"
 	exit 0
 elif [ "$1" == "-b" ]; then
-	BP=true
+	BATTERY_PERCENTAGE_ONLY=true
 #elif [ "$1" == "-q" ]; then
 elif [ "$1" == "-h" ]; then
 	cat << EOF
@@ -211,7 +211,7 @@ echo "Temperature:	${TEMPL}°C"
 
 if [ $ALL ]; then
     echo "Battery: ${BAT_PERCENT}%"
-    if [ $BP ];then						# If -b switch is used, exit after showing battery percentage
+    if [ -v BATTERY_PERCENTAGE_ONLY ];then   # If -b switch is used, exit after showing battery percentage
     	if [ $STATUS_CHG_DIR == 0 ]; then
     		exit 1	# CHIP operating on Battery
     	else
