@@ -69,7 +69,7 @@ STATUS_VBUS=$(($(($REG&0x20))/32))
 STATUS_VBUS_AVAIL=$(($(($REG&0x10))/16))
 STATUS_VHOLD=$(($(($REG&0x08))/8))
 # STATUS_CHG_DIR == 1 when battery is charging
-# STATUS_CHG_DIR == 0 when battery is discharging
+# STATUS_CHG_DIR == 0 when battery is discharging or no battery connected
 STATUS_CHG_DIR=$(($(($REG&0x04))/4))
 ACVB_SHORT=$(($(($REG&0x02))/2))
 STATUS_BOOT=$(($REG&0x01))
@@ -99,7 +99,7 @@ if [ $ALL ];then
 	echo "              ACIN: $STATUS_ACIN	Avail: $STATUS_ACIN_AVAIL"
 	echo "              VBUS: $STATUS_VBUS	Avail: $STATUS_VBUS_AVAIL"
 	echo "             VHOLD: $STATUS_VHOLD (Whether VBUS is above $VHOLD""V before being used)"
-	echo "  Charge direction: $STATUS_CHG_DIR	(0:Battery discharging; 1:The battery is charging)"
+	echo "  Charge direction: $STATUS_CHG_DIR	(0:Battery discharging or no battery; 1:The battery is charging)"
 	echo "  Shutdown voltage: ${VSHUTDOWN}V"
 	echo "VBUS current limit: $VBUS_C_LIM"
 
