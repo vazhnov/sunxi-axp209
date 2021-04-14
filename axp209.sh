@@ -56,6 +56,7 @@ fi
 [ -x /usr/bin/bc ] || sudo apt install bc;
 
 # Check binaries are available (for example, wrong PATH or non-root user):
+PATH="$PATH:/usr/sbin"
 command -v -- i2cset >/dev/null 2>&1 || { echo >&2 'No i2cset found'; exit 1; }
 command -v -- i2cget >/dev/null 2>&1 || { echo >&2 'No i2cget found'; exit 1; }
 command -v -- bc     >/dev/null 2>&1 || { echo >&2 'No bc found'; exit 1; }
