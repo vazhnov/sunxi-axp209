@@ -55,9 +55,9 @@ fi
 
 # Check binaries are available (for example, wrong PATH or non-root user):
 
-command -v -- i2cset || { echo "No i2cset found"; exit 1; }
-command -v -- i2cget || { echo "No i2cget found"; exit 1; }
-command -v -- bc     || { echo "No bc found"; exit 1; }
+command -v -- i2cset >/dev/null 2>&1 || { echo >&2 'No i2cset found'; exit 1; }
+command -v -- i2cget >/dev/null 2>&1 || { echo >&2 'No i2cget found'; exit 1; }
+command -v -- bc     >/dev/null 2>&1 || { echo >&2 'No bc found'; exit 1; }
 
 # Enable ADC registers
 i2cset -y -f 0 0x34 0x82 0xff
