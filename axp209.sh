@@ -4,13 +4,14 @@ set -o errexit
 set -o pipefail
 shopt -s dotglob
 
-# For the CHIP Computer AXP09 Power mangement IC
+# Script code is based on https://github.com/mzhboy/sunxi-axp209 of Mei,
+# which is based on the code https://github.com/Photonicsguy/CHIP of Jeff Brown
+# Here is original link, which is broken at 2021: http://photonicsguy.ca/projects/chip
 #
-# Jeff Brown http://photonicsguy.ca/projects/chip
-# https://github.com/Photonicsguy/CHIP
-# https://github.com/mzhboy/sunxi-axp209
+# Originally, for the CHIP Computer AXP09 Power mangement IC (PMIC).
+# Also works with SBC Olimex A20-OLinuXino-LIME2.
 #
-# It looks like you can destroy your chip computer by writing the wrong data to certain registers on this chip!
+# It looks like you can destroy your CHIP computer by writing the wrong data to certain registers on this chip!
 # (Some of the voltage outputs are programmable via registers)
 #
 # There is only one write command in this script: to enable ADC registers.
@@ -62,8 +63,8 @@ command -v -- bc     >/dev/null 2>&1 || { echo >&2 'No bc found'; exit 1; }
 # Enable ADC registers (if wasn't)
 ADC_REG=$(i2cget -y -f 0 0x34 0x82)
 if [ "$ADC_REG" != "0xff" ]; then
-  echo "ADC registers was: $ADC_REG, I'm going to set them into 0xff"
-  i2cset -y -f 0 0x34 0x82 0xff
+    echo "ADC registers was: $ADC_REG, I'm going to set them into 0xff"
+    i2cset -y -f 0 0x34 0x82 0xff
 fi
 
 ##	REGISTER 00	##
@@ -222,9 +223,9 @@ fi
 
 echo -n "ACIN:	${ACIN}V"
 if [ $ACIN_C != 0 ];then 
-	echo "   ${ACIN_C}mA"
+    echo "   ${ACIN_C}mA"
 else
-	echo ""
+    echo ""
 fi
 
 echo -n "VBUS:	${VBUS}V"
