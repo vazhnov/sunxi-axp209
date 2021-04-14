@@ -52,6 +52,12 @@ fi
 
 [ -x /usr/sbin/i2cset ] || sudo apt install i2c-tools;
 [ -x /usr/bin/bc ] || sudo apt install bc;
+
+# Check binaries are available (for example, wrong PATH or non-root user):
+command -v -- i2cset || { echo "No i2cset found"; exit 1; }
+command -v -- i2cget || { echo "No i2cget found"; exit 1; }
+command -v -- bc     || { echo "No bc found"; exit 1; }
+
 # Enable ADC registers
 i2cset -y -f 0 0x34 0x82 0xff
 
