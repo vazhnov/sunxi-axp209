@@ -1,5 +1,9 @@
-#!/bin/bash
-#
+#!/usr/bin/env bash
+set -o nounset
+set -o errexit
+set -o pipefail
+shopt -s dotglob
+
 # For the CHIP Computer AXP09 Power mangement IC
 #
 # Jeff Brown http://photonicsguy.ca/projects/chip
@@ -10,7 +14,6 @@
 # (Some of the voltage outputs are programmable via registers)
 #
 # There is only one write command in this script: to enable ADC registers.
-#
 #
 #
 # ACIN is PIN2 of U13 (Labeled CHG-IN)
@@ -24,14 +27,12 @@
 #i2cset -y -f 0 0x34 0x30 0x62	# 100mA VBUS current limit (CHIP will draw from both VBUS & Battery)
 #i2cset -y -f 0 0x34 0x30 0x63	# No current limiting on VBUS
 #
-#
-#
 
 if [ "$1" == "-a" ]; then
 	ALL=true
 elif [ "$1" == "-v" ]; then
-	echo "Version 1.0 (April 5th, 2016)"
-	echo "https://github.com/Photonicsguy/CHIP"
+	echo "Version 2 (April 2021)"
+	echo "https://github.com/vazhnov/sunxi-axp209"
 	exit 0
 elif [ "$1" == "-b" ]; then
 	BP=true
@@ -58,8 +59,12 @@ command -v -- i2cset >/dev/null 2>&1 || { echo >&2 'No i2cset found'; exit 1; }
 command -v -- i2cget >/dev/null 2>&1 || { echo >&2 'No i2cget found'; exit 1; }
 command -v -- bc     >/dev/null 2>&1 || { echo >&2 'No bc found'; exit 1; }
 
-# Enable ADC registers
-i2cset -y -f 0 0x34 0x82 0xff
+# Enable ADC registers (if wasn't)
+ADC_REG=$(i2cget -y -f 0 0x34 0x82)
+if [ "$ADC_REG" != "0xff" ]; then
+  echo "ADC registers was: $ADC_REG, I'm going to set them into 0xff"
+  i2cset -y -f 0 0x34 0x82 0xff
+fi
 
 ##	REGISTER 00	##
 REG=$(i2cget -y -f 0 0x34 0x00)
@@ -98,7 +103,7 @@ if [ $ALL ];then
 	REG=
 	echo "              ACIN: $STATUS_ACIN	Avail: $STATUS_ACIN_AVAIL"
 	echo "              VBUS: $STATUS_VBUS	Avail: $STATUS_VBUS_AVAIL"
-	echo "             VHOLD: $STATUS_VHOLD (Whether VBUS is above $VHOLD""V before being used)"
+	echo "             VHOLD: $STATUS_VHOLD (Whether VBUS is above ${VHOLD}V before being used)"
 	echo "  Charge direction: $STATUS_CHG_DIR	(0:Battery discharging or no battery; 1:The battery is charging)"
 	echo "  Shutdown voltage: ${VSHUTDOWN}V"
 	echo "VBUS current limit: $VBUS_C_LIM"
