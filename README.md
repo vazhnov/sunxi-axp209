@@ -64,6 +64,10 @@ VBAT:	4.1371 V  Discharging at 68.5mA
 Vout:	4.1006 V
 ```
 
+## Compatibility
+
+The script also works with [Olimex A20-OLinuXino-LIME2](https://www.olimex.com/Products/OLinuXino/A20/A20-OLinuXino-LIME2/) (Allwinner A20 + AXP209) with [official Olimex Debian image](https://images.olimex.com/release/a20/).
+
 ## Another scripts
 
 * https://github.com/Photonicsguy/CHIP — original script, MIT license
