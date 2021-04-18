@@ -80,5 +80,5 @@ This script only uses one write command to enable ADC registers, everything else
 
 ## References
 
-* http://docs.getchip.com/ - CHIP Documentation
-* https://linux-sunxi.org/AXP209 - Information on chip registers
+* https://docs.getchip.cc/ — CHIP Documentation
+* https://linux-sunxi.org/AXP209 — information on chip registers
