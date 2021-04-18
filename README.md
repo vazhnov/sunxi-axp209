@@ -7,6 +7,12 @@ Shell script for reading voltage & current from the AXP209 Power Management IC f
 * "ACIN" (Pin 2 of U13) voltage & current
 * and more...
 
+## WARNING
+
+Some of the voltage outputs are programmable via registers, so it appears to be possible to damage your CHIP computer by writing the wrong data to certain registers on this chip.
+
+This script only uses one write command to enable ADC registers, everything else is only reading registers.
+
 ## Examples
 
 ```
@@ -57,12 +63,6 @@ VBUS:	5.1442V   100.500mA
 VBAT:	4.1371 V  Discharging at 68.5mA
 Vout:	4.1006 V
 ```
-
-## WARNING
-
-Some of the voltage outputs are programmable via registers, so it appears to be possible to damage your CHIP computer by writing the wrong data to certain registers on this chip.
-
-This script only uses one write command to enable ADC registers, everything else is only reading registers.
 
 ## Another scripts
 
