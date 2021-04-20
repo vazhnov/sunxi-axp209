@@ -76,6 +76,62 @@ The script also works with [Olimex A20-OLinuXino-LIME2](https://www.olimex.com/P
 * https://gist.github.com/andreibosco/9709ea89492e5bdd931d841999a7910c — more complicated script, unknown license
 * https://forum.armbian.com/topic/45-battery/?do=findComment&comment=350, no license/proprietary
 
+## Another methods
+
+### Armbian
+
+Armbian 21.02.3, Linux kernel `Linux lime2 5.10.21-sunxi #21.02.3 SMP Mon Mar 8 00:28:04 UTC 2021 armv7l GNU/Linux`:
+
+Script `/etc/update-motd.d/30-armbian-sysinfo` gives such output:
+
+```
+lime2:~:% bash /etc/update-motd.d/30-armbian-sysinfo
+System load:   5%           	Up time:       12 min
+Memory usage:  6% of 998M   	IP:            192.168.1.182
+CPU temp:      39°C           	Usage of /:    12% of 9.8G   	Battery:       91% discharging
+```
+
+In this script, directory `/sys/power/axp_pmu` named as `mainline_dir`, while `/sys/class/power_supply` is `legacy_dir`.
+
+```
+lime2:~:% ls -lAF /sys/class/power_supply/axp20x-battery/
+total 0
+-r--r--r-- 1 root root 4096 Apr 20 22:32 capacity
+-rw-r--r-- 1 root root 4096 Apr 20 22:32 constant_charge_current
+-rw-r--r-- 1 root root 4096 Apr 20 22:32 constant_charge_current_max
+-r--r--r-- 1 root root 4096 Apr 20 22:32 current_now
+lrwxrwxrwx 1 root root    0 Apr 20 22:32 device -> ../../../axp20x-battery-power-supply/
+-r--r--r-- 1 root root 4096 Apr 20 22:32 health
+drwxr-xr-x 3 root root    0 Apr 20 22:23 hwmon0/
+-r--r--r-- 1 root root 4096 Apr 20 22:32 online
+drwxr-xr-x 2 root root    0 Apr 20 22:23 power/
+-r--r--r-- 1 root root 4096 Apr 20 22:32 present
+-r--r--r-- 1 root root 4096 Apr 20 22:32 status
+lrwxrwxrwx 1 root root    0 Apr 20 22:23 subsystem -> ../../../../../../../../../class/power_supply/
+-r--r--r-- 1 root root 4096 Apr 20 22:32 type
+-rw-r--r-- 1 root root 4096 Apr 20 22:23 uevent
+-rw-r--r-- 1 root root 4096 Apr 20 22:32 voltage_max_design
+-rw-r--r-- 1 root root 4096 Apr 20 22:32 voltage_min_design
+-r--r--r-- 1 root root 4096 Apr 20 22:25 voltage_now
+-r--r--r-- 1 root root 4096 Apr 20 22:32 voltage_ocv
+drwxr-xr-x 2 root root    0 Apr 20 22:23 wakeup4/
+
+lime2:~:% ls -lAF /sys/power/axp_pmu/battery/
+total 0
+-r--r--r-- 1 root root 4096 Apr 20 22:31 amperage
+-r--r--r-- 1 root root 4096 Apr 20 22:24 capacity
+-r--r--r-- 1 root root 4096 Apr 20 22:31 charge
+-r--r--r-- 1 root root 4096 Apr 20 22:31 charging
+-r--r--r-- 1 root root 4096 Apr 20 22:24 connected
+-r--r--r-- 1 root root 4096 Apr 20 22:31 power
+-r--r--r-- 1 root root 4096 Apr 20 22:31 ts_voltage
+-r--r--r-- 1 root root 4096 Apr 20 22:31 voltage
+
+lime2:~:% cat /sys/power/axp_pmu/battery/voltage /sys/class/power_supply/axp20x-battery/voltage_now
+3977600
+3977000
+```
+
 ## TODO
 
 * Try `/proc/acpi/battery/BAT0`
