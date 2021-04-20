@@ -126,10 +126,18 @@ total 0
 -r--r--r-- 1 root root 4096 Apr 20 22:31 power
 -r--r--r-- 1 root root 4096 Apr 20 22:31 ts_voltage
 -r--r--r-- 1 root root 4096 Apr 20 22:31 voltage
+```
 
+The values are slightly different:
+
+```
 lime2:~:% cat /sys/power/axp_pmu/battery/voltage /sys/class/power_supply/axp20x-battery/voltage_now
 3977600
 3977000
+
+lime2:~:% cat /sys/class/power_supply/axp20x-battery/current_now /sys/power/axp_pmu/battery/amperage
+485000
+489500
 ```
 
 Loaded kernel modules:
