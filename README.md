@@ -132,10 +132,19 @@ lime2:~:% cat /sys/power/axp_pmu/battery/voltage /sys/class/power_supply/axp20x-
 3977000
 ```
 
+Loaded kernel modules:
+
+```
+lime2:~:% lsmod| grep axp
+axp20x_battery         16384  0
+axp20x_adc             16384  0
+industrialio           53248  3 axp20x_battery,sun4i_gpadc_iio,axp20x_adc
+pinctrl_axp209         16384  0
+```
+
 ## TODO
 
 * Try `/proc/acpi/battery/BAT0`
-* Try `/sys/devices/platform/sunxi-i2c.0/i2c-0/0-0034/axp20-supplyer.28/power_supply/battery/`
 
 
 ## References
