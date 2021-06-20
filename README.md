@@ -1,4 +1,6 @@
-# CHIP
+# Get information from AXP209
+
+This script was originally created for CHIP single-board computer.
 
 Shell script for reading voltage & current from the AXP209 Power Management IC for the CHIP $9 computer
 * Battery charge %
